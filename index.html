@@ -6,90 +6,264 @@
   <style>
     *{box-sizing:border-box;font-family:system-ui, sans-serif;}
     body{background:#1a1a1a;color:#fff;padding:12px;margin:0;}
-    .panel{max-width:320px;margin:0 auto;background:#222;padding:12px;border-radius:10px;}
-    .row{margin:8px 0;display:flex;gap:6px;align-items:center;}
-    label{width:70px;font-size:14px;}
-    input{width:100%;padding:6px 8px;background:#333;color:#fff;border:1px solid #444;border-radius:6px;font-size:14px;}
-    /* 新增radio样式，适配整体风格 */
-    .radio-group{display:flex;gap:12px;width:100%;}
-    .radio-item{display:flex;align-items:center;gap:4px;cursor:pointer;}
-    .radio-item input[type="radio"]{width:auto;height:14px;accent-color:#007bff;}
-    .btn{background:#007bff;color:#fff;border:none;padding:8px 10px;border-radius:6px;cursor:pointer;font-size:14px;}
+    .panel{max-width:500px;margin:0 auto;background:#222;padding:18px;border-radius:12px;box-shadow:0 0 10px rgba(0,0,0,0.3);}
+    .title{text-align:center;font-size:18px;margin-bottom:15px;color:#007bff;font-weight:600;}
+    .row{margin:10px 0;display:flex;gap:8px;align-items:center;}
+    label{width:70px;font-size:14px;color:#ddd;}
+    input{width:100%;padding:8px 10px;background:#333;color:#fff;border:1px solid #444;border-radius:6px;font-size:14px;outline:none;}
+    input:focus{border-color:#007bff;}
+    .radio-group{display:flex;gap:15px;width:100%;}
+    .radio-item{display:flex;align-items:center;gap:5px;cursor:pointer;}
+    .radio-item input[type="radio"]{width:auto;height:16px;accent-color:#007bff;}
+    .btn{background:#007bff;color:#fff;border:none;padding:9px 12px;border-radius:6px;cursor:pointer;font-size:14px;width:100%;margin-top:5px;transition:background 0.2s;}
+    .btn:hover{background:#0066cc;}
     .btn:active{background:#0056b3;}
-    .result{margin-top:10px;padding:10px;background:#111;border-radius:8px;font-size:15px;line-height:1.4;}
-    .green{color:#0c0;}
-    .gray{color:#aaa;}
+    .result{margin-top:15px;padding:12px;background:#111;border-radius:8px;font-size:15px;line-height:1.6;min-height:100px;}
+    .green{color:#00cc66;font-weight:600;}
+    .red{color:#ff4444;font-weight:600;}
+    .orange{color:#ff9500;font-weight:600;}
+    .blue{color:#0099ff;font-weight:600;}
+    .gray{color:#aaa;font-size:13px;}
+    .tip{font-size:12px;color:#888;margin-top:8px;}
+    .highlight{background:#333;padding:2px 4px;border-radius:3px;color:#ffcc00;}
+    /* 新增用户手册样式 */
+    .manual{margin-top:20px;padding:15px;background:#1a1a1a;border-radius:8px;border:1px solid #333;}
+    .manual-title{font-size:16px;color:#007bff;margin-bottom:10px;font-weight:600;text-align:center;}
+    .manual-section{margin:8px 0;}
+    .manual-subtitle{font-size:14px;color:#00cc66;margin:6px 0;font-weight:600;}
+    .manual-content{font-size:13px;line-height:1.5;color:#ddd;margin-left:8px;}
+    .manual-list{margin:4px 0;padding-left:20px;}
+    .manual-list li{margin:2px 0;}
   </style>
 </head>
 <body>
 <div class="panel">
+  <div class="title">0成本减仓计算器</div>
+  
   <div class="row">
     <label>入场价</label>
-    <input type="number" id="entry">
+    <input type="number" id="entry" step="0.01" placeholder="例如：4000">
   </div>
-  <!-- 把原输入框改成radio单选组 -->
+  
   <div class="row">
     <label>方向</label>
     <div class="radio-group">
       <div class="radio-item">
-        <input type="radio" name="direction" id="sell" value="sell" checked>
-        <label for="sell" style="width:auto;">卖出</label>
+        <input type="radio" name="direction" id="sell" value="sell">
+        <label for="sell" style="width:auto;">卖出（空）</label>
       </div>
       <div class="radio-item">
-        <input type="radio" name="direction" id="buy" value="buy">
-        <label for="buy" style="width:auto;">买入</label>
+        <input type="radio" name="direction" id="buy" value="buy" checked>
+        <label for="buy" style="width:auto;">买入（多）</label>
       </div>
     </div>
   </div>
+  
   <div class="row">
     <label>止损价</label>
-    <input type="number" id="stop">
+    <input type="number" id="stop" step="0.01" placeholder="例如：3980">
   </div>
+  
   <div class="row">
     <label>总手数</label>
-    <input type="number" id="lots">
+    <input type="number" id="lots" step="0.001" placeholder="例如：1">
   </div>
+  
   <div class="row">
     <label>现价</label>
-    <input type="number" id="now" placeholder="点一下输入">
-    <button class="btn" onclick="calc()">计算 0 成本</button>
+    <input type="number" id="now" step="0.01" placeholder="例如：4001">
   </div>
-  <div class="result" id="result"></div>
+  
+  <button class="btn" onclick="calc()">计算 0 成本仓位</button>
+  
+  <div class="result" id="result">
+    <div class="gray">📌 填写所有参数后点击计算</div>
+  </div>
+
+  <!-- 用户手册部分 -->
+  <div class="manual">
+    <div class="manual-title">0成本减仓计算器 用户手册</div>
+    
+    <div class="manual-section">
+      <div class="manual-subtitle">1. 工具简介</div>
+      <div class="manual-content">
+        本工具用于在交易盈利时，计算需要平仓多少手，使得剩余仓位的成本归零（即剩余仓位即使触发止损，也不会亏损本金），从而实现“无风险持仓”。
+        理论平仓手数 = 总手数 × 止损点数 / (止损点数 + 浮盈点数)。
+      </div>
+    </div>
+    
+    <div class="manual-section">
+      <div class="manual-subtitle">2. 输入参数</div>
+      <div class="manual-content">
+        <ul class="manual-list">
+          <li>入场价：你开仓时的成交价格。</li>
+          <li>方向：选择“买入（多）”或“卖出（空）”。</li>
+          <li>止损价：你预设的止损价格。</li>
+          <li>总手数：你开仓的总数量（支持小数，如0.01手）。</li>
+          <li>现价：当前市场价格。</li>
+        </ul>
+      </div>
+    </div>
+    
+    <div class="manual-section">
+      <div class="manual-subtitle">3. 使用步骤</div>
+      <div class="manual-content">
+        <ul class="manual-list">
+          <li>填写所有输入框（确保数字准确）。</li>
+          <li>点击 “计算 0 成本仓位” 按钮。</li>
+          <li>查看下方结果区域，根据提示操作。</li>
+        </ul>
+      </div>
+    </div>
+    
+    <div class="manual-section">
+      <div class="manual-subtitle">4. 结果解读</div>
+      <div class="manual-content">
+        根据浮盈情况，结果分为三种：<br>
+        <ul class="manual-list">
+          <li>🔴 未盈利：提示“当前未盈利”，无法实现0成本。显示止损点数和浮盈点数（负值）。</li>
+          <li>🟠 浮盈不足，无实操价值：理论保留手数小于最小交易单位（0.01手）。显示理论平仓/保留手数，并给出建议：增加总手数或等待更大浮盈。</li>
+          <li>🟢 可操作（有浮盈且保留手数≥0.01）：显示理论平仓/保留手数（精确到3位小数）。给出实操建议手数（按0.01倍数向上取整），并标注取整后是否仍满足0成本条件。同时显示止损点数和浮盈点数，供参考。</li>
+        </ul>
+      </div>
+    </div>
+    
+    <div class="manual-section">
+      <div class="manual-subtitle">5. 注意事项</div>
+      <div class="manual-content">
+        <ul class="manual-list">
+          <li>本计算器假设不考虑交易手续费、滑点等成本，实际交易中请自行评估。</li>
+          <li>手数最小变动单位为0.01，工具已自动按此取整，优先保证0成本（平仓手数向上取整）。</li>
+          <li>计算结果仅作参考，市场波动可能导致条件变化，建议实时计算。</li>
+        </ul>
+      </div>
+    </div>
+  </div>
 </div>
 
 <script>
 function $(id){return document.getElementById(id)}
+
+// 核心配置
+const CONFIG = {
+  minOperableLots: 0.01,        // 最小可操作手数
+  lotStep: 0.01,                // 手数最小变动单位（0.01倍数）
+  decimalPlaces: 3,             // 常规显示小数位
+  precisePlaces: 6              // 精准显示小数位
+}
+
+// 修正后的工具函数：优先保证0成本，平仓手数向上取整
+function getRoundedLots(closeLots, totalLots) {
+  // 平仓手数向上取整到0.01倍数（确保≥理论值）
+  const closeRounded = Math.ceil(closeLots / CONFIG.lotStep) * CONFIG.lotStep;
+  // 保留手数 = 总手数 - 实际平仓手数（自动满足0.01倍数）
+  const keepRounded = totalLots - closeRounded;
+  // 防止保留手数为负（极端情况）
+  return {
+    closeRounded: Math.min(closeRounded, totalLots),
+    keepRounded: Math.max(keepRounded, 0)
+  };
+}
+
+// 新增：计算需要增加到的最小手数
+function getRequiredMinLots(stopPoints, profitPoints) {
+  // 公式推导：理论保留手数 ≥ 0.01
+  // lots × (profitPoints / (stopPoints + profitPoints)) ≥ 0.01
+  // lots ≥ 0.01 × (stopPoints + profitPoints) / profitPoints
+  if (profitPoints <= 0) return 0;
+  const requiredLots = CONFIG.minOperableLots * (stopPoints + profitPoints) / profitPoints;
+  // 向上取整到0.01倍数（符合交易规则）
+  const roundedLots = Math.ceil(requiredLots / CONFIG.lotStep) * CONFIG.lotStep;
+  return roundedLots;
+}
+
 function calc(){
+  // 1. 获取并校验输入
   const entry = +$('entry').value
-  // 修改：获取radio选中的值，替代原输入框取值
   const type = document.querySelector('input[name="direction"]:checked').value
   const stop = +$('stop').value
   const now = +$('now').value
   const lots = +$('lots').value
 
   if(!entry || !stop || !now || !lots || !['buy','sell'].includes(type)){
-    $('result').innerHTML = '请填完整'
+    $('result').innerHTML = '<span class="red">⚠️ 请填写完整所有参数</span>'
     return
   }
 
+  // 2. 核心计算
   const stopPoints = Math.abs(entry - stop)
   const profitPoints = type === 'buy' ? now - entry : entry - now
 
+  // 3. 分场景处理结果
+  let resultHtml = ''
+  
+  // 场景1：未盈利/浮亏
   if(profitPoints <= 0){
-    $('result').innerHTML = `未盈利<br>止损点数：${stopPoints} | 浮盈：${profitPoints.toFixed(1)}`
-    return
+    resultHtml = `
+      <span class="red">⚠️ 当前未盈利</span><br>
+      止损点数：${stopPoints.toFixed(1)}<br>
+      当前浮盈：${profitPoints.toFixed(1)} 点<br>
+      <div class="gray tip">浮盈为负时无法实现0成本仓位</div>
+    `
+  }
+  // 场景2：有浮盈
+  else {
+    const ratio = stopPoints / (profitPoints + stopPoints)
+    const closeLots = lots * ratio          // 理论平仓手数
+    const keepLots = lots * (1 - ratio)     // 理论保留手数
+
+// 子场景A：保留仓位 < 0.01 手（无实操价值）
+if(keepLots < CONFIG.minOperableLots){
+  // 计算需要的最小手数和需要增加的手数
+  const requiredMinLots = getRequiredMinLots(stopPoints, profitPoints);
+  const needAddLots = (requiredMinLots - lots).toFixed(CONFIG.decimalPlaces);
+  
+  let tipText = '';
+  // 先判断分母是否为0（即 lots == CONFIG.minOperableLots）
+  const denominator = lots - CONFIG.minOperableLots;
+  if (denominator <= 0) {
+    // 分母为0或负数，只提示增加手数，不再算浮盈
+    tipText = lots <=0.01 ? `建议：当前总手数<=0.01，无法继续减仓，需增加总手数` : `建议：总手数需增加到<span class="highlight">${requiredMinLots.toFixed(2)}</span>手（需增加${needAddLots}手）`;
+  } else {
+    const requiredProfit = (stopPoints * CONFIG.minOperableLots) / denominator;
+    tipText = `建议：总手数需增加到<span class="highlight">${requiredMinLots.toFixed(2)}</span>手（需增加${needAddLots}手），或等浮盈>${requiredProfit.toFixed(1)}点后再计算`;
   }
 
-  const ratio = stopPoints / (profitPoints + stopPoints)
-  const close = lots * ratio
-  const keep = lots * (1 - ratio)
-
-  $('result').innerHTML = `
-    <span class=green>✅ 0 成本仓位</span><br>
-    需平掉：${close.toFixed(3)} 手<br>
-    需保留：${keep.toFixed(3)} 手<br>
-    <span class=gray>止损 ${stopPoints} 点 | 浮盈 ${profitPoints.toFixed(1)} 点</span>
+  resultHtml = `
+    <span class="orange">⚠️ 浮盈不足，无实操价值</span><br>
+    理论平仓：${closeLots.toFixed(CONFIG.precisePlaces)} 手<br>
+    理论保留：${keepLots.toFixed(CONFIG.precisePlaces)} 手<br>
+    <span class="gray">（理论保留手数＜${CONFIG.minOperableLots}手，达不到最小交易单位）</span><br>
+    止损：${stopPoints} 点 | 浮盈：${profitPoints} 点<br>
+    <div class="gray tip">${tipText}</div>
   `
+}
+    // 子场景B：保留仓位 ≥ 0.01 手（可操作）
+    else {
+      // 获取修正后的取整手数（平仓向上取整）
+      const { closeRounded: closeLotsRounded, keepRounded: keepLotsRounded } = getRoundedLots(closeLots, lots);
+      
+      // 校验取整后是否满足0成本
+      const profitAfterClose = closeLotsRounded * profitPoints;
+      const lossIfStop = keepLotsRounded * stopPoints;
+      const isZeroCost = profitAfterClose >= lossIfStop;
+
+      resultHtml = `
+        <span class="green">✅ 可实现0成本仓位</span><br>
+        理论平仓：${closeLots.toFixed(CONFIG.precisePlaces)} 手<br>
+        理论保留：${keepLots.toFixed(CONFIG.precisePlaces)} 手<br>
+        <span class="blue">📝 实操建议（0.01倍数）：</span><br>
+        实际平仓：<span class="highlight">${closeLotsRounded.toFixed(2)}</span> 手<br>
+        实际保留：<span class="highlight">${keepLotsRounded.toFixed(2)}</span> 手<br>
+        <span class="gray">止损：${stopPoints} 点 | 浮盈：${profitPoints.toFixed(1)} 点<br>
+        ${isZeroCost ? '✅ 取整后仍满足0成本' : '⚠️ 取整后需注意小幅亏损风险'}</span><br>
+        <div class="gray tip">平仓向上取整，优先保证0成本</div>
+      `
+    }
+  }
+
+  // 4. 渲染结果
+  $('result').innerHTML = resultHtml
 }
 </script>
 </body>
